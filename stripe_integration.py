@@ -88,8 +88,14 @@ def verify_webhook_signature(payload, signature):
         event: Verified Stripe event object or None
     """
     try:
+        # Read webhook secret at runtime (not cached at import)
+        webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+        if not webhook_secret:
+            print("[ERROR] STRIPE_WEBHOOK_SECRET not set!")
+            return None
+        
         event = stripe.Webhook.construct_event(
-            payload, signature, STRIPE_WEBHOOK_SECRET
+            payload, signature, webhook_secret
         )
         return event
     except ValueError as e:
