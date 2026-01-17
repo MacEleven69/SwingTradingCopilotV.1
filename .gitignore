@@ -1,0 +1,34 @@
+# Environment variables (NEVER commit!)
+.env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Database
+*.db
+*.sqlite3
+instance/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Extension build
+extension/*.zip
+
+# Logs
+*.log

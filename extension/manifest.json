@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Swing Trading Copilot",
+  "version": "1.0.0",
+  "description": "AI-powered swing trading analysis with real-time scores and professional insights",
+  "permissions": [
+    "activeTab",
+    "sidePanel",
+    "contextMenus",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "http://localhost:5000/*"
+  ]
+}
+

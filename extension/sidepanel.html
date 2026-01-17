@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swing Trading Copilot - Side Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Side Panel specific adjustments */
+        body {
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: none;
+            min-height: 100vh;
+            width: 100%;
+        }
+        
+        /* Wider layout for side panel */
+        .breakdown-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        /* Side panel indicator */
+        .side-panel-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Screen (License Paywall) -->
+    <div class="auth-screen" id="authScreen" style="display: none;">
+        <div class="auth-container">
+            <div class="auth-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 17a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/>
+                    <path d="M8 11V7a4 4 0 118 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            
+            <h2 class="auth-title">Unlock Swing Copilot</h2>
+            <p class="auth-subtitle">Enter your license key to access AI-powered swing trading analysis</p>
+            
+            <div class="auth-form">
+                <div class="auth-input-wrapper">
+                    <input 
+                        type="text" 
+                        id="licenseKeyInput" 
+                        class="auth-input" 
+                        placeholder="PRO-XXXXXX-YYYYYY"
+                        autocomplete="off"
+                    />
+                    <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <div class="auth-error" id="authError" style="display: none;"></div>
+                
+                <button id="activateBtn" class="auth-button">
+                    <span class="auth-btn-text">Activate License</span>
+                    <span class="auth-btn-loader"></span>
+                </button>
+            </div>
+            
+            <div class="auth-footer">
+                <p class="auth-help">Don't have a license key?</p>
+                <a href="https://swingcopilot.com/pricing" target="_blank" class="auth-link">Get a License Key →</a>
+            </div>
+            
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>AI-Powered Analysis</span>
+                </div>
+                <div class="auth-feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Real-Time Market Data</span>
+                </div>
+                <div class="auth-feature">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>News Sentiment Analysis</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainApp">
+        <!-- Header -->
+        <header style="position: relative;">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" fill="currentColor"/>
+                </svg>
+                <h1>Swing Copilot</h1>
+            </div>
+            <span class="side-panel-badge">📌 Pinned</span>
+            <div class="status-indicator" id="status">
+                <span class="dot"></span>
+                <span class="text">Ready</span>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" id="tabAnalyzer" data-tab="analyzer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Analyzer
+            </button>
+            <button class="tab-btn" id="tabMarket" data-tab="market">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M7 14l4-4 4 4 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Market
+            </button>
+        </nav>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- ANALYZER VIEW (Default) -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div id="analyzer-view" class="tab-content active">
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="tickerInput" 
+                    placeholder="Enter ticker (e.g., AAPL)" 
+                    autocomplete="off"
+                    autofocus
+                />
+                <button id="analyzeBtn" class="btn-primary">
+                    <span class="btn-text">Analyze</span>
+                    <span class="btn-loader"></span>
+                </button>
+            </div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <!-- Results Section (Initially Hidden) -->
+        <div class="results-section" id="results" style="display: none;">
+            
+            <!-- Score Gauge -->
+            <div class="score-card">
+                <div class="card-header">
+                    <h2 id="tickerSymbol">AAPL</h2>
+                    <span class="price" id="currentPrice">$150.00</span>
+                </div>
+                
+                <div class="gauge-container">
+                    <svg class="gauge" viewBox="0 0 200 120">
+                        <!-- Background arc -->
+                        <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100" stroke-width="20" fill="none"/>
+                        <!-- Colored arc (animated) -->
+                        <path class="gauge-fill" id="gaugeFill" d="M 20 100 A 80 80 0 0 1 180 100" stroke-width="20" fill="none" stroke-dasharray="0 251.2"/>
+                    </svg>
+                    <div class="score-display">
+                        <div class="score-number" id="scoreNumber">0</div>
+                        <div class="score-label">Swing Score</div>
+                    </div>
+                </div>
+                
+                <!-- Verdict Badge -->
+                <div id="verdict-badge" class="verdict-badge">--</div>
+
+                <!-- Score Breakdown -->
+                <div class="breakdown-grid">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Technicals</span>
+                        <span class="breakdown-value" id="trend">--</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Market Regime</span>
+                        <span class="breakdown-value" id="momentum">--</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Relative Strength</span>
+                        <span class="breakdown-value" id="volatility">--</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">AI Sentiment</span>
+                        <span class="breakdown-value" id="volume">--</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Verdict</span>
+                        <span class="breakdown-value" id="supportResistance">--</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Total Score</span>
+                        <span class="breakdown-value" id="rsi">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trade Setup Card (Beginner Friendly) -->
+            <div class="trade-setup-card" id="tradeSetupCard">
+                <div class="setup-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h3>Your Trade Plan</h3>
+                </div>
+                
+                <!-- Row 1: Best Value (Entry Zone) -->
+                <div class="setup-row entry-row" id="entryRow" title="The optimal price range to buy. Don't chase high prices.">
+                    <div class="setup-icon">💎</div>
+                    <div class="setup-info">
+                        <span class="setup-label">Best Value</span>
+                        <span class="setup-hint">Good price to buy</span>
+                    </div>
+                    <div class="setup-value" id="entryZone">--</div>
+                </div>
+                
+                <!-- Row 2: Safety Net (Stop Loss) -->
+                <div class="setup-row stop-row" id="stopRow" title="If the price drops below this, sell to protect your money.">
+                    <div class="setup-icon">🛡️</div>
+                    <div class="setup-info">
+                        <span class="setup-label">Safety Net</span>
+                        <span class="setup-hint">Sell if it drops here</span>
+                    </div>
+                    <div class="setup-value setup-value-muted" id="stopPrice">--</div>
+                </div>
+                
+                <!-- Row 3: Dual Profit Targets -->
+                <div class="setup-row target-row" id="targetRow">
+                    <div class="setup-icon">🎯</div>
+                    <div class="setup-info">
+                        <span class="setup-label">Profit Targets</span>
+                        <span class="setup-hint">Choose your exit strategy</span>
+                    </div>
+                </div>
+                
+                <!-- Dual Target Buttons -->
+                <div class="dual-targets" id="dualTargets">
+                    <div class="target-option target-safe" id="targetSafe" title="Conservative target. Higher win rate. (~75% probability)">
+                        <div class="target-badge">🛡️ SAFE</div>
+                        <div class="target-price" id="targetSafePrice">--</div>
+                        <div class="target-pct" id="targetSafePct">+4%</div>
+                        <div class="target-prob">
+                            <span class="prob-label">Win Rate:</span>
+                            <span class="prob-value" id="probSafe">~75%</span>
+                        </div>
+                    </div>
+                    <div class="target-option target-aggro" id="targetAggro" title="Aggressive target. Lower probability. (~40% probability)">
+                        <div class="target-badge">🔥 AGGRO</div>
+                        <div class="target-price" id="targetAggroPrice">--</div>
+                        <div class="target-pct" id="targetAggroPct">+10%</div>
+                        <div class="target-prob">
+                            <span class="prob-label">Win Rate:</span>
+                            <span class="prob-value" id="probAggro">~40%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendation Badge -->
+                <div class="target-recommendation" id="targetRecommendation">
+                    <span class="rec-icon">💡</span>
+                    <span class="rec-text">Recommended: Take the <strong>Safe</strong> target for consistent gains</span>
+                </div>
+                
+                <!-- Status Indicator -->
+                <div class="setup-status" id="setupStatus">
+                    <span class="status-dot" id="setupStatusDot"></span>
+                    <span class="status-text" id="setupStatusText">Analyzing...</span>
+                </div>
+            </div>
+
+            <!-- Analyst Note -->
+            <div class="analyst-card">
+                <div class="analyst-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h3>Analyst Assessment</h3>
+                </div>
+                
+                <!-- AI Summary Paragraph -->
+                <div class="ai-summary-section">
+                    <div class="ai-summary-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        AI Analysis
+                    </div>
+                    <p id="aiSummary" class="ai-summary-text">Analyzing market sentiment...</p>
+                </div>
+                
+                <div class="analyst-content">
+                    <div class="insight">
+                        <div class="insight-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Key Risk
+                        </div>
+                        <p id="biggestRisk" class="insight-text">Analyzing...</p>
+                    </div>
+                    <div class="insight">
+                        <div class="insight-label">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Key Strength
+                        </div>
+                        <p id="biggestStrength" class="insight-text">Analyzing...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Section -->
+            <div class="news-section">
+                <h3 class="news-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Recent Headlines
+                </h3>
+                <div class="news-list" id="newsList">
+                    <!-- News items will be inserted here -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Skeleton Loader -->
+        <div class="skeleton-loader" id="skeleton" style="display: none;">
+            <div class="skeleton-header">
+                <div class="skeleton-line skeleton-title"></div>
+                <div class="skeleton-line skeleton-subtitle"></div>
+            </div>
+            <div class="skeleton-gauge"></div>
+            <div class="skeleton-grid">
+                <div class="skeleton-box"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-box"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+            </div>
+        </div>
+
+        </div><!-- END analyzer-view -->
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- MARKET VIEW (Netflix-style Discovery) -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div id="market-view" class="tab-content" style="display: none;">
+            <div class="market-header">
+                <h2>📊 Market Watch</h2>
+                <p class="market-subtitle">Tap any stock to analyze</p>
+            </div>
+            
+            <div class="market-categories" id="marketCategories">
+                <!-- Categories will be rendered by JavaScript -->
+                <div class="market-loading">Loading watchlist...</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <span class="powered-by">Powered by AI</span>
+            <span class="version">v1.0.0 | Side Panel</span>
+        </footer>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
+
