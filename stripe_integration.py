@@ -96,26 +96,47 @@ def verify_webhook_signature(payload, signature):
     """
     try:
         # Initialize Stripe API key at runtime
-        get_stripe_api_key()
+        api_key = get_stripe_api_key()
+        print(f"[DEBUG] Stripe API key set: {bool(api_key)}")
         
         # Read webhook secret at runtime
         webhook_secret = get_webhook_secret()
+        print(f"[DEBUG] Webhook secret set: {bool(webhook_secret)}")
+        print(f"[DEBUG] Webhook secret prefix: {webhook_secret[:10] if webhook_secret else 'NONE'}...")
+        print(f"[DEBUG] Signature received: {signature[:50] if signature else 'NONE'}...")
+        print(f"[DEBUG] Payload type: {type(payload)}, length: {len(payload) if payload else 0}")
+        
         if not webhook_secret:
             print("[ERROR] STRIPE_WEBHOOK_SECRET not set!")
             return None
         
+        if not signature:
+            print("[ERROR] No signature provided!")
+            return None
+        
+        # Ensure payload is bytes
+        if isinstance(payload, str):
+            payload = payload.encode('utf-8')
+        
         event = stripe.Webhook.construct_event(
             payload, signature, webhook_secret
         )
+        print(f"[DEBUG] Event constructed successfully: {event['type']}")
         return event
     except ValueError as e:
         print(f"[ERROR] Invalid payload: {e}")
+        import traceback
+        traceback.print_exc()
         return None
     except stripe.error.SignatureVerificationError as e:
         print(f"[ERROR] Invalid signature: {e}")
+        import traceback
+        traceback.print_exc()
         return None
     except Exception as e:
-        print(f"[ERROR] Webhook verification error: {e}")
+        print(f"[ERROR] Webhook verification error: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 

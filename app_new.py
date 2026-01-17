@@ -692,6 +692,19 @@ def admin_stats():
         }), 500
 
 
+@app.route('/admin/debug', methods=['GET'])
+def admin_debug():
+    """Debug endpoint to check environment"""
+    import os
+    webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET', '')
+    return jsonify({
+        'stripe_secret_set': bool(os.getenv('STRIPE_SECRET_KEY')),
+        'webhook_secret_set': bool(webhook_secret),
+        'webhook_secret_prefix': webhook_secret[:10] + '...' if webhook_secret else 'NOT SET',
+        'stripe_price_id_set': bool(os.getenv('STRIPE_PRICE_ID'))
+    }), 200
+
+
 @app.route('/admin/create-test-key', methods=['POST'])
 def create_test_key():
     """Create a test license key (for development only)"""
