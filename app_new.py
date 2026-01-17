@@ -666,6 +666,40 @@ def admin_stats():
         }), 500
 
 
+@app.route('/admin/create-test-key', methods=['POST'])
+def create_test_key():
+    """Create a test license key (for development only)"""
+    try:
+        test_key = 'PRO-TEST00-KEY123'
+        existing = License.query.filter_by(key=test_key).first()
+        
+        if existing:
+            return jsonify({
+                'status': 'exists',
+                'key': test_key,
+                'message': 'Test key already exists'
+            }), 200
+        
+        test_license = License(
+            key=test_key,
+            email='test@swingtradingcopilot.com',
+            tier='pro',
+            status='active'
+        )
+        db.session.add(test_license)
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'created',
+            'key': test_key,
+            'message': 'Test key created successfully'
+        }), 201
+    except Exception as e:
+        return jsonify({
+            'error': f'Failed to create test key: {str(e)}'
+        }), 500
+
+
 if __name__ == '__main__':
     print("\n" + "="*80)
     print("[START] SWING TRADING COPILOT BACKEND")
