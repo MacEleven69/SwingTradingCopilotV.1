@@ -796,7 +796,10 @@ def terms_of_service():
             <h2>6. Acceptance</h2>
             <p>By purchasing a license or using Swing Trading Copilot, you confirm that you have read, understood, and agree to these Terms of Service.</p>
             
-            <p style="margin-top: 40px; color: #64748b; text-align: center;">
+            <p style="margin-top: 30px; color: #94a3b8; text-align: center;">
+                <strong>Questions?</strong> Contact: angelxjimenezz@outlook.com
+            </p>
+            <p style="margin-top: 10px; color: #64748b; text-align: center;">
                 &copy; 2026 Swing Trading Copilot. All rights reserved.
             </p>
         </div>
