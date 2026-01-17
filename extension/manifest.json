@@ -19,7 +19,7 @@
     "service_worker": "background.js"
   },
   "host_permissions": [
-    "http://localhost:5000/*"
+    "https://swingtradingcopilotv1-production.up.railway.app/*"
   ]
 }
 

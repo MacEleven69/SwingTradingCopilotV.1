@@ -3,7 +3,7 @@
  * Production-ready with error handling, animations, and license authentication
  */
 
-const API_URL = 'http://localhost:5000/api/analyze';
+const API_URL = 'https://swingtradingcopilotv1-production.up.railway.app/api/analyze';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MARKET WATCHLIST DATA
