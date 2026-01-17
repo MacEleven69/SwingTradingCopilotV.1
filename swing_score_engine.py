@@ -4,7 +4,7 @@ NO WEBSOCKET - Safe for HFT bot coexistence
 """
 
 import pandas as pd
-import pandas_ta as ta
+import ta as ta_lib
 from datetime import datetime, timedelta
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
@@ -113,10 +113,10 @@ class SwingScoreEngine:
         max_score_cap = 100  # Default no cap
         
         try:
-            # Calculate indicators
-            df['sma_200'] = ta.sma(df['close'], length=200)
-            df['ema_20'] = ta.ema(df['close'], length=20)
-            df['rsi'] = ta.rsi(df['close'], length=14)
+            # Calculate indicators using ta library
+            df['sma_200'] = ta_lib.trend.sma_indicator(df['close'], window=200)
+            df['ema_20'] = ta_lib.trend.ema_indicator(df['close'], window=20)
+            df['rsi'] = ta_lib.momentum.rsi(df['close'], window=14)
             
             current_price = df['close'].iloc[-1]
             sma_200 = df['sma_200'].iloc[-1]
@@ -241,7 +241,7 @@ class SwingScoreEngine:
         
         try:
             # SPY trend
-            spy_df['sma_50'] = ta.sma(spy_df['close'], length=50)
+            spy_df['sma_50'] = ta_lib.trend.sma_indicator(spy_df['close'], window=50)
             spy_current = spy_df['close'].iloc[-1]
             spy_sma_50 = spy_df['sma_50'].iloc[-1]
             
@@ -333,11 +333,11 @@ class SwingScoreEngine:
         - prob_safe, prob_aggro: Estimated win probabilities
         """
         try:
-            # Calculate indicators
-            df['ema_20'] = ta.ema(df['close'], length=20)
-            df['sma_50'] = ta.sma(df['close'], length=50)
-            df['sma_200'] = ta.sma(df['close'], length=200)
-            df['atr'] = ta.atr(df['high'], df['low'], df['close'], length=14)
+            # Calculate indicators using ta library
+            df['ema_20'] = ta_lib.trend.ema_indicator(df['close'], window=20)
+            df['sma_50'] = ta_lib.trend.sma_indicator(df['close'], window=50)
+            df['sma_200'] = ta_lib.trend.sma_indicator(df['close'], window=200)
+            df['atr'] = ta_lib.volatility.average_true_range(df['high'], df['low'], df['close'], window=14)
             
             current_price = df['close'].iloc[-1]
             ema_20 = df['ema_20'].iloc[-1]
