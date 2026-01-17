@@ -30,3 +30,6 @@ python-dotenv==1.0.0
 
 # Payment Processing
 stripe==6.7.0
+
+# Email Service
+resend==0.7.0

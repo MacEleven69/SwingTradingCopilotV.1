@@ -219,7 +219,7 @@ def handle_subscription_deleted(subscription):
 
 def send_license_email(email, license_key, tier='pro'):
     """
-    Send license key to customer via email
+    Send license key to customer via email using Resend
     
     Args:
         email: Customer email address
@@ -229,42 +229,79 @@ def send_license_email(email, license_key, tier='pro'):
     Returns:
         bool: Success status
     """
-    # TODO: Implement email sending
-    # For now, just log it
-    
     print("\n" + "="*80)
-    print("[EMAIL] EMAIL TO SEND")
+    print("[EMAIL] SENDING LICENSE EMAIL")
     print("="*80)
     print(f"To: {email}")
-    print(f"Subject: Your Swing Trading Copilot License Key")
-    print()
     print(f"License Key: {license_key}")
     print(f"Tier: {tier.upper()}")
-    print("="*80 + "\n")
     
-    # TODO: Implement with SendGrid, AWS SES, or SMTP
-    """
-    Example with SendGrid:
+    # Check if Resend is configured
+    resend_api_key = os.getenv('RESEND_API_KEY')
     
-    import sendgrid
-    from sendgrid.helpers.mail import Mail
+    if not resend_api_key:
+        print("[!] RESEND_API_KEY not set - email not sent")
+        print("[!] License key logged above for manual delivery")
+        print("="*80 + "\n")
+        return False
     
-    sg = sendgrid.SendGridAPIClient(api_key=os.getenv('SENDGRID_API_KEY'))
-    message = Mail(
-        from_email='support@swingcopilot.com',
-        to_emails=email,
-        subject='Your Swing Trading Copilot License Key',
-        html_content=f'''
-            <h1>Welcome to Swing Trading Copilot!</h1>
-            <p>Your License Key: <strong>{license_key}</strong></p>
-            <p>Get started at: https://chrome.google.com/webstore/...</p>
-        '''
-    )
-    response = sg.send(message)
-    return response.status_code == 202
-    """
-    
-    return True
+    try:
+        import resend
+        resend.api_key = resend_api_key
+        
+        # Send the email
+        response = resend.Emails.send({
+            "from": "Swing Trading Copilot <onboarding@resend.dev>",
+            "to": [email],
+            "subject": "Your Swing Trading Copilot License Key",
+            "html": f"""
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 40px; text-align: center; color: white;">
+                    <h1 style="margin: 0 0 10px 0; font-size: 28px;">Welcome to Swing Trading Copilot!</h1>
+                    <p style="margin: 0; opacity: 0.9;">Your AI-powered trading assistant is ready</p>
+                </div>
+                
+                <div style="background: #f8fafc; border-radius: 16px; padding: 30px; margin-top: 20px; text-align: center;">
+                    <p style="color: #64748b; margin: 0 0 15px 0;">Your License Key:</p>
+                    <div style="background: #1e293b; color: #10b981; font-family: 'Courier New', monospace; font-size: 24px; font-weight: bold; padding: 20px; border-radius: 12px; letter-spacing: 2px;">
+                        {license_key}
+                    </div>
+                    <p style="color: #64748b; font-size: 14px; margin-top: 15px;">Tier: {tier.upper()}</p>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                    <h3 style="color: #1e293b; margin: 0 0 15px 0;">How to Activate:</h3>
+                    <ol style="color: #64748b; padding-left: 20px; margin: 0;">
+                        <li style="margin-bottom: 10px;">Install the Chrome extension</li>
+                        <li style="margin-bottom: 10px;">Click the extension icon</li>
+                        <li style="margin-bottom: 10px;">Enter your license key above</li>
+                        <li>Start analyzing stocks!</li>
+                    </ol>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #fef3c7; border-radius: 12px; border-left: 4px solid #f59e0b;">
+                    <p style="color: #92400e; margin: 0; font-size: 13px;">
+                        <strong>Important:</strong> This tool is for educational purposes only. Not financial advice. Trading involves risk of loss.
+                    </p>
+                </div>
+                
+                <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 30px;">
+                    Questions? Contact angelxjimenezz@outlook.com<br>
+                    &copy; 2026 Swing Trading Copilot
+                </p>
+            </div>
+            """
+        })
+        
+        print(f"[OK] Email sent successfully! ID: {response.get('id', 'unknown')}")
+        print("="*80 + "\n")
+        return True
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to send email: {e}")
+        print("[!] License key logged above for manual delivery")
+        print("="*80 + "\n")
+        return False
 
 
 def get_session_details(session_id):
