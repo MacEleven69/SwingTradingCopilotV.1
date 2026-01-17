@@ -673,6 +673,139 @@ def payment_cancel():
     return html
 
 
+@app.route('/terms')
+def terms_of_service():
+    """
+    Terms of Service & Disclaimer Page
+    """
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Terms of Service - Swing Trading Copilot</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+                background: #0a0e1a;
+                color: #f1f5f9;
+                padding: 40px 20px;
+                line-height: 1.8;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: #131827;
+                padding: 40px;
+                border-radius: 16px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            }
+            h1 {
+                color: #3b82f6;
+                margin-bottom: 10px;
+            }
+            h2 {
+                color: #8b5cf6;
+                margin-top: 30px;
+                margin-bottom: 15px;
+                border-bottom: 1px solid #334155;
+                padding-bottom: 10px;
+            }
+            .warning-box {
+                background: rgba(239, 68, 68, 0.15);
+                border: 1px solid #ef4444;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+            }
+            .warning-box h3 {
+                color: #ef4444;
+                margin-bottom: 10px;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            li {
+                margin-bottom: 10px;
+            }
+            .updated {
+                color: #64748b;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Terms of Service & Disclaimer</h1>
+            <p class="updated">Last Updated: January 17, 2026</p>
+            
+            <div class="warning-box">
+                <h3>IMPORTANT DISCLAIMER</h3>
+                <p><strong>Swing Trading Copilot is an EDUCATIONAL and INFORMATIONAL tool only.</strong></p>
+                <ul>
+                    <li>This software does NOT provide financial advice, investment advice, or trading recommendations.</li>
+                    <li>All analysis, scores, and suggestions are for EDUCATIONAL PURPOSES ONLY.</li>
+                    <li>Past performance does not guarantee future results.</li>
+                    <li>Trading stocks involves significant risk of loss.</li>
+                </ul>
+            </div>
+            
+            <h2>1. No Guarantee of Profits</h2>
+            <p>By using Swing Trading Copilot, you acknowledge and agree that:</p>
+            <ul>
+                <li><strong>You may lose money</strong> - Trading involves substantial risk of loss</li>
+                <li><strong>No guaranteed returns</strong> - We make no promises about profits or performance</li>
+                <li><strong>You are responsible</strong> - All trading decisions are yours alone</li>
+                <li><strong>Do your own research</strong> - Our tool is one input, not a complete strategy</li>
+            </ul>
+            
+            <h2>2. Not Financial Advice</h2>
+            <p>Swing Trading Copilot and its creators:</p>
+            <ul>
+                <li>Are NOT registered investment advisors</li>
+                <li>Are NOT licensed brokers or dealers</li>
+                <li>Do NOT provide personalized investment advice</li>
+                <li>Do NOT guarantee the accuracy of any data or analysis</li>
+            </ul>
+            <p><strong>Always consult a qualified financial professional before making investment decisions.</strong></p>
+            
+            <h2>3. Limitation of Liability</h2>
+            <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW:</p>
+            <ul>
+                <li>We are NOT liable for any trading losses you incur</li>
+                <li>We are NOT liable for decisions made based on our tool</li>
+                <li>We are NOT liable for technical errors or data inaccuracies</li>
+                <li>Our total liability is limited to the amount you paid for the software</li>
+            </ul>
+            
+            <h2>4. Assumption of Risk</h2>
+            <p>By using this software, you acknowledge that:</p>
+            <ul>
+                <li>Stock trading is inherently risky</li>
+                <li>You could lose some or all of your investment</li>
+                <li>You are trading at your own risk</li>
+                <li>You have read and understood these terms</li>
+            </ul>
+            
+            <h2>5. Refund Policy</h2>
+            <ul>
+                <li>Subscriptions may be cancelled at any time</li>
+                <li>No refunds for partial subscription periods</li>
+                <li>License keys are revoked upon cancellation</li>
+            </ul>
+            
+            <h2>6. Acceptance</h2>
+            <p>By purchasing a license or using Swing Trading Copilot, you confirm that you have read, understood, and agree to these Terms of Service.</p>
+            
+            <p style="margin-top: 40px; color: #64748b; text-align: center;">
+                &copy; 2026 Swing Trading Copilot. All rights reserved.
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    return html
+
+
 @app.route('/admin/stats', methods=['GET'])
 def admin_stats():
     """

@@ -1400,3 +1400,24 @@ footer {
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
+ 
+ / *   L e g a l   D i s c l a i m e r   * /  
+ . d i s c l a i m e r   {  
+         p a d d i n g :   8 p x   1 6 p x ;  
+         b a c k g r o u n d :   r g b a ( 2 3 9 ,   6 8 ,   6 8 ,   0 . 1 ) ;  
+         b o r d e r - t o p :   1 p x   s o l i d   r g b a ( 2 3 9 ,   6 8 ,   6 8 ,   0 . 3 ) ;  
+         t e x t - a l i g n :   c e n t e r ;  
+ }  
+ . d i s c l a i m e r   p   {  
+         f o n t - s i z e :   1 0 p x ;  
+         c o l o r :   v a r ( - - t e x t - m u t e d ) ;  
+         l i n e - h e i g h t :   1 . 4 ;  
+ }  
+ . d i s c l a i m e r   a   {  
+         c o l o r :   v a r ( - - a c c e n t - p r i m a r y ) ;  
+         t e x t - d e c o r a t i o n :   n o n e ;  
+ }  
+ . d i s c l a i m e r   a : h o v e r   {  
+         t e x t - d e c o r a t i o n :   u n d e r l i n e ;  
+ }  
+ 
