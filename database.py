@@ -242,22 +242,22 @@ def init_db(app):
         db.create_all()
         print("[OK] Database initialized")
         
-        # Check if we have any licenses
-        license_count = License.query.count()
-        if license_count == 0:
-            # Create a test license for development/testing
+        # Ensure test license exists
+        test_key = 'PRO-TEST00-KEY123'
+        existing = License.query.filter_by(key=test_key).first()
+        if not existing:
             test_license = License(
-                key='PRO-TEST00-KEY123',
+                key=test_key,
                 email='test@swingtradingcopilot.com',
                 tier='pro',
                 status='active'
             )
             db.session.add(test_license)
             db.session.commit()
-            print("[OK] Test license created: PRO-TEST00-KEY123")
-        else:
-            stats = get_license_stats()
-            print(f"[DB] Licenses: {stats['active']} active, {stats['revoked']} revoked")
+            print(f"[OK] Test license created: {test_key}")
+        
+        stats = get_license_stats()
+        print(f"[DB] Licenses: {stats['active']} active, {stats['revoked']} revoked")
 
 
 if __name__ == '__main__':
