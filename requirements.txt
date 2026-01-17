@@ -29,4 +29,4 @@ pandas-ta>=0.3.14b
 python-dotenv==1.0.0
 
 # Payment Processing
-stripe==5.5.0
+stripe==6.7.0
