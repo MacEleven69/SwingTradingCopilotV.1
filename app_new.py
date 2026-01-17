@@ -431,29 +431,55 @@ def payment_success():
     Displays license key to customer immediately after purchase.
     """
     try:
-        # Get session ID from URL
+        # Get session ID from URL (optional now)
         session_id = request.args.get('session_id')
+        email_param = request.args.get('email')
         
-        if not session_id:
-            return "Error: No session ID provided", 400
+        customer_email = None
         
-        # Get session details
-        session_details = get_session_details(session_id)
+        # Try to get email from session ID
+        if session_id:
+            session_details = get_session_details(session_id)
+            if 'error' not in session_details:
+                customer_email = session_details.get('customer_email')
         
-        if 'error' in session_details:
-            return f"Error: {session_details['error']}", 400
-        
-        # Get customer email
-        customer_email = session_details.get('customer_email')
-        
-        if not customer_email:
-            return "Error: No customer email found", 400
+        # Or use email parameter directly
+        if not customer_email and email_param:
+            customer_email = email_param
         
         # Find license in database
-        license = License.query.filter_by(email=customer_email).order_by(License.created_at.desc()).first()
+        license = None
+        if customer_email:
+            license = License.query.filter_by(email=customer_email).order_by(License.created_at.desc()).first()
         
+        # If no license found, show lookup form
         if not license:
-            return "License not found. Please check your email or contact support.", 404
+            html = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Find Your License - Swing Trading Copilot</title>
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+                    .container { background: white; border-radius: 20px; padding: 50px; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
+                    h1 { color: #1f2937; }
+                    input[type="email"] { width: 100%; padding: 15px; font-size: 16px; border: 2px solid #e5e7eb; border-radius: 10px; box-sizing: border-box; margin: 20px 0; }
+                    .button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Find Your License Key</h1>
+                    <p>Enter the email you used for payment:</p>
+                    <form method="GET" action="/success">
+                        <input type="email" name="email" placeholder="your@email.com" required>
+                        <br><button type="submit" class="button">Find My License</button>
+                    </form>
+                </div>
+            </body>
+            </html>
+            """
+            return html
         
         # Display success page with license key
         html = f"""
