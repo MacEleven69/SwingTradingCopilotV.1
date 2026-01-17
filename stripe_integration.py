@@ -15,12 +15,19 @@ from database import create_license
 # Load environment variables
 load_dotenv()
 
-# Initialize Stripe
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+def get_stripe_api_key():
+    """Get Stripe API key at runtime"""
+    key = os.getenv('STRIPE_SECRET_KEY')
+    if key:
+        stripe.api_key = key
+    return key
 
-# Configuration
+def get_webhook_secret():
+    """Get webhook secret at runtime"""
+    return os.getenv('STRIPE_WEBHOOK_SECRET')
+
+# Configuration (read at runtime when needed)
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
-STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 STRIPE_PRODUCT_ID = os.getenv('STRIPE_PRODUCT_ID')
 STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')
 
@@ -88,8 +95,11 @@ def verify_webhook_signature(payload, signature):
         event: Verified Stripe event object or None
     """
     try:
-        # Read webhook secret at runtime (not cached at import)
-        webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+        # Initialize Stripe API key at runtime
+        get_stripe_api_key()
+        
+        # Read webhook secret at runtime
+        webhook_secret = get_webhook_secret()
         if not webhook_secret:
             print("[ERROR] STRIPE_WEBHOOK_SECRET not set!")
             return None
@@ -103,6 +113,9 @@ def verify_webhook_signature(payload, signature):
         return None
     except stripe.error.SignatureVerificationError as e:
         print(f"[ERROR] Invalid signature: {e}")
+        return None
+    except Exception as e:
+        print(f"[ERROR] Webhook verification error: {e}")
         return None
 
 
