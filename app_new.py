@@ -447,10 +447,14 @@ def payment_success():
         if not customer_email and email_param:
             customer_email = email_param
         
-        # Find license in database
+        # Find license in database (case-insensitive)
         license = None
         if customer_email:
+            # Try exact match first
             license = License.query.filter_by(email=customer_email).order_by(License.created_at.desc()).first()
+            # If not found, try case-insensitive
+            if not license:
+                license = License.query.filter(License.email.ilike(customer_email)).order_by(License.created_at.desc()).first()
         
         # If no license found, show lookup form
         if not license:
@@ -839,6 +843,35 @@ def admin_debug():
         'webhook_secret_prefix': webhook_secret[:10] + '...' if webhook_secret else 'NOT SET',
         'stripe_price_id_set': bool(os.getenv('STRIPE_PRICE_ID'))
     }), 200
+
+
+@app.route('/admin/licenses', methods=['GET'])
+def admin_licenses():
+    """
+    Admin endpoint - View all licenses
+    
+    WARNING: In production, protect this with admin authentication!
+    """
+    try:
+        licenses = License.query.order_by(License.created_at.desc()).all()
+        return jsonify({
+            'status': 'success',
+            'count': len(licenses),
+            'licenses': [
+                {
+                    'key': lic.key,
+                    'email': lic.email,
+                    'tier': lic.tier,
+                    'status': lic.status,
+                    'created_at': lic.created_at.isoformat() if lic.created_at else None
+                }
+                for lic in licenses
+            ]
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'error': f'Failed to retrieve licenses: {str(e)}'
+        }), 500
 
 
 @app.route('/admin/create-test-key', methods=['POST'])
