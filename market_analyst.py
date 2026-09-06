@@ -10,10 +10,13 @@ Comprehensive market analysis combining:
 
 Uses OpenAI GPT-4o-mini as a "Senior Swing Trading Mentor"
 Provides actionable insights even without news data.
+
+News Source: Yahoo Finance (FREE via yfinance library)
 """
 
 import requests
 import json
+import yfinance as yf
 from typing import Dict, List, Optional
 from datetime import datetime
 from config import config
@@ -27,21 +30,18 @@ class MarketAnalyst:
     
     def __init__(self):
         """Initialize with API keys from config"""
-        self.polygon_api_key = config.POLYGON_API_KEY
         self.openai_api_key = config.OPENAI_API_KEY
         
-        if not self.polygon_api_key:
-            raise ValueError("POLYGON_API_KEY not found in config")
         if not self.openai_api_key:
             raise ValueError("OPENAI_API_KEY not found in config")
         
         print(f"[OK] MarketAnalyst initialized")
-        print(f"   Polygon: {self.polygon_api_key[:8]}...")
+        print(f"   News Source: Yahoo Finance (FREE)")
         print(f"   OpenAI: {self.openai_api_key[:15]}...")
     
     def fetch_news(self, ticker: str, limit: int = 10) -> List[Dict]:
         """
-        Fetch recent news articles for a ticker
+        Fetch recent news articles for a ticker using Yahoo Finance (FREE)
         
         Args:
             ticker: Stock ticker symbol
@@ -51,63 +51,55 @@ class MarketAnalyst:
             List of news articles with title, url, etc.
         """
         try:
-            # Fetch general market news (no ticker filter since it doesn't work well)
-            url = "https://api.polygon.io/v2/reference/news"
-            params = {
-                'limit': 50,  # Fetch more to find relevant ones
-                'order': 'desc',
-                'sort': 'published_utc',
-                'apiKey': self.polygon_api_key
-            }
+            print(f"[NEWS] Fetching news for {ticker} from Yahoo Finance (FREE)...")
             
-            print(f"[NEWS] Fetching news for {ticker}...")
-            response = requests.get(url, params=params, timeout=10)
-            response.raise_for_status()
+            # Use yfinance to get ticker news
+            stock = yf.Ticker(ticker)
+            news_data = stock.news
             
-            data = response.json()
-            
-            if 'results' not in data or len(data['results']) == 0:
-                print(f"   [!]  No news found")
+            if not news_data or len(news_data) == 0:
+                print(f"   [!]  No news found for {ticker}")
                 return []
             
-            print(f"   [OK] Found {len(data['results'])} articles from API")
+            print(f"   [OK] Found {len(news_data)} articles from Yahoo Finance")
             
-            # Search through articles for ticker-specific ones
+            # Transform Yahoo Finance news format to match our existing format
             ticker_articles = []
             
-            for article in data['results']:
-                title = article.get('title', '')
-                article_tickers = article.get('tickers', [])
+            for article in news_data[:limit]:
+                # Yahoo Finance news structure (as of yfinance 1.7.0):
+                # News is nested under 'content' key:
+                # - content.title: Article title
+                # - content.summary: Article summary
+                # - content.pubDate: Publication date (ISO format)
+                # - content.provider.displayName: Publisher name
+                # - content.clickThroughUrl.url or content.canonicalUrl.url: Article link
                 
-                # Check if ticker is in the tickers list OR mentioned in title
-                ticker_upper = ticker.upper()
-                in_tickers_list = ticker_upper in [t.upper() for t in article_tickers]
-                in_title = ticker_upper in title.upper()
+                content = article.get('content', {})
+                provider = content.get('provider', {})
+                click_url = content.get('clickThroughUrl', {})
+                canonical_url = content.get('canonicalUrl', {})
                 
-                if in_tickers_list or in_title:
-                    ticker_articles.append({
-                        'title': title,
-                        'description': article.get('description', ''),
-                        'published_utc': article.get('published_utc', ''),
-                        'publisher': article.get('publisher', {}).get('name', 'Unknown'),
-                        'article_url': article.get('article_url', '#')
-                    })
-                    
-                    # Stop after finding enough relevant articles
-                    if len(ticker_articles) >= 10:
-                        break
+                # Get the article URL (prefer clickThroughUrl, fallback to canonicalUrl)
+                article_url = click_url.get('url') or canonical_url.get('url', '#')
+                
+                ticker_articles.append({
+                    'title': content.get('title', 'No title'),
+                    'description': content.get('summary', ''),
+                    'published_utc': content.get('pubDate', ''),  # Already in ISO format
+                    'publisher': provider.get('displayName', 'Unknown'),
+                    'article_url': article_url
+                })
             
             # Show results
             if ticker_articles:
-                print(f"   [OK] Found {len(ticker_articles)} relevant articles")
+                print(f"   [OK] Processed {len(ticker_articles)} articles")
                 print(f"   📄 First: {ticker_articles[0]['title'][:60]}...")
-            else:
-                print(f"   [!]  No ticker-specific articles found")
             
             return ticker_articles
             
         except Exception as e:
-            print(f"   [ERROR] Error fetching news: {e}")
+            print(f"   [ERROR] Error fetching news from Yahoo Finance: {e}")
             return []
     
     def analyze_context(self, ticker: str, score: int, breakdown: Dict, news_list: List[Dict] = None) -> Dict:

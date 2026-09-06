@@ -20,8 +20,8 @@ class Config:
     ALPACA_BASE_URL = os.getenv('ALPACA_BASE_URL', 'https://paper-api.alpaca.markets')
     # For live: 'https://api.alpaca.markets'
     
-    # Polygon API (News)
-    POLYGON_API_KEY = os.getenv('POLYGON_API_KEY')
+    # News Source: Yahoo Finance via yfinance (FREE - no API key needed!)
+    # POLYGON_API_KEY no longer required - using Yahoo Finance instead
     
     # OpenAI API (Sentiment)
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -40,7 +40,6 @@ class Config:
         required = {
             'ALPACA_API_KEY': cls.ALPACA_API_KEY,
             'ALPACA_SECRET_KEY': cls.ALPACA_SECRET_KEY,
-            'POLYGON_API_KEY': cls.POLYGON_API_KEY,
             'OPENAI_API_KEY': cls.OPENAI_API_KEY
         }
         
@@ -57,7 +56,7 @@ class Config:
         return {
             'alpaca_key': f"{cls.ALPACA_API_KEY[:8]}..." if cls.ALPACA_API_KEY else "NOT SET",
             'alpaca_url': cls.ALPACA_BASE_URL,
-            'polygon_key': f"{cls.POLYGON_API_KEY[:8]}..." if cls.POLYGON_API_KEY else "NOT SET",
+            'news_source': 'Yahoo Finance (FREE - yfinance)',
             'openai_key': f"{cls.OPENAI_API_KEY[:15]}..." if cls.OPENAI_API_KEY else "NOT SET",
             'lookback_days': cls.LOOKBACK_DAYS,
             'cache_timeout': f"{cls.CACHE_TIMEOUT}s"
